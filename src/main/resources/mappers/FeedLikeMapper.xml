@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.green.greengram.application.feedlike.FeedLikeMapper">
+    <select id="findAllLikeCountAndWhetherLikeByFeedIdInAndUserId">
+        SELECT A.feed_id, A.likeCount, B.feed_id IS NOT NULL AS isLike
+          FROM (
+                SELECT feed_id, COUNT(feed_id) AS likeCount
+                  FROM feed_like
+                 WHERE feed_id IN
+                <foreach collection="feedIdList" item="item" separator="," open="(" close=")">
+                    #{item}
+                </foreach>
+                 GROUP BY feed_id
+             ) A
+          LEFT JOIN feed_like B
+            ON B.feed_id = A.feed_id
+           AND B.user_id = #{signedUserId}
+    </select>
+</mapper>
